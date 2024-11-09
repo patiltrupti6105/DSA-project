@@ -5,12 +5,18 @@ class Player {
     String name;
     String position;
     int score;
+    int fantasyPoints;  // Fantasy points for the player
 
     Player(String id, String name, String position) {
         this.id = id;
         this.name = name;
         this.position = position;
         this.score = 0;
+        this.fantasyPoints = 0;  // Initialize fantasy points
+    }
+
+    void addFantasyPoints(int points) {
+        this.fantasyPoints += points;  // Update fantasy points
     }
 }
 
@@ -18,11 +24,13 @@ class Team {
     String id;
     String name;
     List<Player> players;
+    int fantasyPoints;  // Total fantasy points for the team
 
     Team(String id, String name) {
         this.id = id;
         this.name = name;
         this.players = new ArrayList<>();
+        this.fantasyPoints = 0;
     }
 
     void addPlayer(Player player) {
@@ -40,7 +48,17 @@ class Team {
         }
         return totalScore;
     }
+
+    int getTotalFantasyPoints() {
+        int totalFantasyPoints = 0;
+        for (Player player : players) {
+            totalFantasyPoints += player.fantasyPoints;
+        }
+        this.fantasyPoints = totalFantasyPoints;
+        return totalFantasyPoints;
+    }
 }
+
 
 class Match {
     String id;
@@ -66,12 +84,28 @@ public class FantasyLeagueManagementSystem {
     HashMap<String, Match> matches = new HashMap<>();
     PriorityQueue<Team> leaderboard = new PriorityQueue<>((a, b) -> b.getTotalScore() - a.getTotalScore());
     Stack<String> recentActions = new Stack<>();
-    
+
     Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         FantasyLeagueManagementSystem flms = new FantasyLeagueManagementSystem();
         flms.run();
+    }
+
+    void displayMenu() {
+        System.out.println("\nFantasy League Management System");
+        System.out.println("1. Add Player");
+        System.out.println("2. Remove Player");
+        System.out.println("3. Search Player");
+        System.out.println("4. Create Team");
+        System.out.println("5. Add Player to Team");
+        System.out.println("6. Schedule Match");
+        System.out.println("7. Update Match Result");
+        System.out.println("8. Display Leaderboard");
+        System.out.println("9. Display Fantasy Leaderboard");
+        System.out.println("10. Undo Last Action");
+        System.out.println("11. Exit");
+        System.out.print("Enter your choice: ");
     }
 
     void run() {
@@ -88,8 +122,9 @@ public class FantasyLeagueManagementSystem {
                     case 6 -> scheduleMatch();
                     case 7 -> updateMatchResult();
                     case 8 -> displayLeaderboard();
-                    case 9 -> undoLastAction();
-                    case 10 -> {
+                    case 9 -> displayFantasyLeaderboard();  // New Option
+                    case 10 -> undoLastAction();
+                    case 11 -> {
                         System.out.println("Exiting the system. Goodbye!");
                         return;
                     }
@@ -103,20 +138,6 @@ public class FantasyLeagueManagementSystem {
         }
     }
 
-    void displayMenu() {
-        System.out.println("\nFantasy League Management System");
-        System.out.println("1. Add Player");
-        System.out.println("2. Remove Player");
-        System.out.println("3. Search Player");
-        System.out.println("4. Create Team");
-        System.out.println("5. Add Player to Team");
-        System.out.println("6. Schedule Match");
-        System.out.println("7. Update Match Result");
-        System.out.println("8. Display Leaderboard");
-        System.out.println("9. Undo Last Action");
-        System.out.println("10. Exit");
-        System.out.print("Enter your choice: ");
-    }
 
     void addPlayer() {
         try {
@@ -224,11 +245,47 @@ public class FantasyLeagueManagementSystem {
             String id = scanner.nextLine();
             Match match = matches.get(id);
             if (match != null) {
+                Team team1 = teams.get(match.team1Id);
                 System.out.print("Enter score for Team " + match.team1Id + ": ");
-                match.team1Score = Integer.parseInt(scanner.nextLine());
-                System.out.print("Enter score for Team " + match.team2Id + ": ");
-                match.team2Score = Integer.parseInt(scanner.nextLine());
+                match.team1Score = 0;
 
+                
+                for (Player player : team1.players) {
+                    System.out.print("Score for " + player.name + " (ID: " + player.id + "): ");
+                    int playerScore = Integer.parseInt(scanner.nextLine());
+                    player.score += playerScore;
+                    match.team1Score += playerScore;
+                    
+                    if (playerScore == 1) {
+                        player.addFantasyPoints(2);
+                    } else if (playerScore > 2) {
+                        player.addFantasyPoints(5);
+                    } else if (playerScore > 3) {
+                        player.addFantasyPoints(7);
+                    }
+                }
+
+                Team team2 = teams.get(match.team2Id);
+                System.out.print("Enter score for Team " + match.team2Id + ": ");
+                match.team2Score=0;
+
+                
+                for (Player player : team2.players) {
+                    System.out.print("Score for " + player.name + " (ID: " + player.id + "): ");
+                    int playerScore = Integer.parseInt(scanner.nextLine());
+                    player.score += playerScore;
+                    match.team2Score+=playerScore;
+                    
+                    if (playerScore == 1) {
+                        player.addFantasyPoints(2);
+                    } else if (playerScore > 2) {
+                        player.addFantasyPoints(5);
+                    } else if (playerScore > 3) {
+                        player.addFantasyPoints(7);
+                    }
+                }
+
+                // Set match result
                 if (match.team1Score > match.team2Score) {
                     match.result = "Team " + match.team1Id + " wins";
                 } else if (match.team1Score < match.team2Score) {
@@ -236,6 +293,11 @@ public class FantasyLeagueManagementSystem {
                 } else {
                     match.result = "Draw";
                 }
+
+                
+                team1.getTotalFantasyPoints();
+                team2.getTotalFantasyPoints();
+
                 recentActions.push("UpdateMatchResult " + id);
                 System.out.println("✔ Match result updated: " + match.result);
             } else {
@@ -247,6 +309,7 @@ public class FantasyLeagueManagementSystem {
             System.out.println("✘ Error updating match result: " + e.getMessage());
         }
     }
+
 
     void displayLeaderboard() {
         try {
@@ -263,10 +326,32 @@ public class FantasyLeagueManagementSystem {
         }
     }
 
+
+    void displayFantasyLeaderboard() {
+        List<Team> fantasyLeaderboard = new ArrayList<>(teams.values());
+
+        // Bubble sort 
+        int n = fantasyLeaderboard.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (fantasyLeaderboard.get(j).getTotalFantasyPoints() < fantasyLeaderboard.get(j + 1).getTotalFantasyPoints()) {                    
+                    Team temp = fantasyLeaderboard.get(j);
+                    fantasyLeaderboard.set(j, fantasyLeaderboard.get(j + 1));
+                    fantasyLeaderboard.set(j + 1, temp);
+                }
+            }
+        }
+
+        System.out.println("\nFantasy Leaderboard:");
+        for (Team team : fantasyLeaderboard) {
+            System.out.println(team.name + " - Fantasy Points: " + team.getTotalFantasyPoints());
+        }
+    }
+
     void undoLastAction() {
         try {
             if (!recentActions.isEmpty()) {
-                String lastAction = recentActions.pop();
+                String lastAction = String.valueOf(recentActions.pop());
                 String[] actionParts = lastAction.split(" ");
                 switch (actionParts[0]) {
                     case "AddPlayer" -> {
@@ -274,7 +359,7 @@ public class FantasyLeagueManagementSystem {
                         System.out.println("✔ Last action undone: Added player removed.");
                     }
                     case "RemovePlayer" -> {
-                        // Here you would ideally re-add the removed player
+                        
                         System.out.println("✘ Undo for removing player not implemented.");
                     }
                     case "CreateTeam" -> {
