@@ -2,84 +2,57 @@ package DSA;
 import java.util.*;
 
 public class FantasyLeagueManagementSystem {
-    PlayerHashtable players = new PlayerHashtable(15);
-    HashMap<String, Team> teams = new HashMap<>();
-    HashMap<String, Match> matches = new HashMap<>();
-    CustomPriorityQueue teamsleaderboard = new CustomPriorityQueue();
-    Stack recentActions = new Stack();
-    
+    // Data structures for storing players, teams, matches, and recent actions
+    PlayerHashtable players = new PlayerHashtable(15); // HashTable for players
+    HashMap<String, Team> teams = new HashMap<>(); // HashMap for teams
+    HashMap<String, Match> matches = new HashMap<>(); // HashMap for matches
+    CustomPriorityQueue teamsleaderboard = new CustomPriorityQueue(); // Priority queue for leaderboard
+    Stack<String> recentActions = new Stack<>(); // Stack to track recent actions for undo feature
+
     Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         FantasyLeagueManagementSystem flms = new FantasyLeagueManagementSystem();
-        flms.run();
+        flms.run(); // Start the system
     }
 
+    // Main run loop for the Fantasy League Management System
     void run() {
         while (true) {
             try {
                 displayMenu();
-                int choice = Integer.parseInt(scanner.nextLine().trim());
+                int choice = Integer.parseInt(scanner.nextLine().trim()); // Parse user input
                 switch (choice) {
-                    case 1 :
-                    	addPlayer();
-                    	break;
-                    case 2 :
-                    	removePlayer();
-                    	break;
-                    case 3 :
-                    	searchPlayer();
-                    	break;
-                    case 4 :
-                    	createTeam();
-                    	break;
-                    case 5 :
-                    	addPlayerToTeam();
-                    	break;
-                    case 6:
-                    	removePlayerFromTeam();
-                    	break;
-                    case 7:
-                    	displayTeam();
-                    	break;
-                    case 8 :
-                    	scheduleMatch();
-                    	break;
-                    case 9 :
-                    	updateMatchResult();
-                    	break;
-                    case 10 : 
-                    	displayTeamsLeaderboard();
-                    	break;
-                    case 11 :
-                    	displayPlayerLeaderBoard();
-                    	break;
-                    case 12 :
-                    	displayFantasyLeaderboard();
-                    	break;
-                    case 13 :
-                    	undoLastAction();
-                    	break;
-                    case 14 :
-                    	displayMatchHistory();
-                    	break;
-                    case 15 :
+                    case 1: addPlayer(); break;
+                    case 2: removePlayer(); break;
+                    case 3: searchPlayer(); break;
+                    case 4: createTeam(); break;
+                    case 5: addPlayerToTeam(); break;
+                    case 6: removePlayerFromTeam(); break;
+                    case 7: displayTeam(); break;
+                    case 8: scheduleMatch(); break;
+                    case 9: updateMatchResult(); break;
+                    case 10: displayTeamsLeaderboard(); break;
+                    case 11: displayPlayerLeaderBoard(); break;
+                    case 12: displayFantasyLeaderboard(); break;
+                    case 13: undoLastAction(); break;
+                    case 14: displayMatchHistory(); break;
+                    case 15:
                         System.out.println("Exiting the system. Goodbye!");
                         return;
-                    default :
-                    	System.out.println("Invalid choice. Try again.");
-                    	break;
+                    default:
+                        System.out.println("Invalid choice. Try again.");
+                        break;
                 }
-            } 
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
-            } 
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("An unexpected error occurred: " + e.getMessage());
             }
         }
     }
 
+    // Display menu options
     void displayMenu() {
         System.out.println("\nFantasy League Management System");
         System.out.println("1. Add Player");
@@ -99,7 +72,8 @@ public class FantasyLeagueManagementSystem {
         System.out.println("15. Exit");
         System.out.print("Enter your choice: ");
     }
-    //1.done
+
+    // Adds a player to the system
     void addPlayer() {
         try {
             System.out.print("Enter player ID: ");
@@ -109,33 +83,32 @@ public class FantasyLeagueManagementSystem {
             System.out.print("Enter player position: ");
             String position = scanner.nextLine();
             players.put(id, new Player(id, name, position));
-            recentActions.push("AddPlayer " + id);
+            recentActions.push("AddPlayer " + id); // Record action for undo
             System.out.println("✔ Player added successfully.");
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("✘ Error adding player: " + e.getMessage());
         }
     }
-    //2.done
+
+    // Removes a player from the system
     void removePlayer() {
         try {
             System.out.print("Enter player ID to remove: ");
             String id = scanner.nextLine();
             if (players.containsKey(id)) {
-            	Player temp=players.get(id);
-            	players.remove(id);
-                recentActions.push("RemovePlayer " + id+" "+temp.name+" "+temp.position+" "+temp.score);
+                Player temp = players.get(id);
+                players.remove(id);
+                recentActions.push("RemovePlayer " + id + " " + temp.name + " " + temp.position + " " + temp.score); // Record action for undo
                 System.out.println("✔ Player removed successfully.");
-            } 
-            else {
+            } else {
                 System.out.println("✘ Player not found.");
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("✘ Error removing player: " + e.getMessage());
         }
     }
-    //3.done
+
+    // Searches for a player by ID
     void searchPlayer() {
         try {
             System.out.print("Enter player ID to search: ");
@@ -146,12 +119,12 @@ public class FantasyLeagueManagementSystem {
             } else {
                 System.out.println("✘ Player not found.");
             }
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("✘ Error searching player: " + e.getMessage());
         }
     }
-    //4.done
+
+    // Creates a team in the system
     void createTeam() {
         try {
             System.out.print("Enter team ID: ");
@@ -159,14 +132,14 @@ public class FantasyLeagueManagementSystem {
             System.out.print("Enter team name: ");
             String name = scanner.nextLine();
             teams.put(id, new Team(id, name));
-            recentActions.push("CreateTeam " + id);
+            recentActions.push("CreateTeam " + id); // Record action for undo
             System.out.println("✔ Team created successfully.");
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("✘ Error creating team: " + e.getMessage());
         }
     }
-    //5.done
+
+    // Adds a player to a team
     void addPlayerToTeam() {
         try {
             System.out.print("Enter team ID: ");
@@ -177,21 +150,20 @@ public class FantasyLeagueManagementSystem {
             Player player = players.get(playerId);
             if (team != null && player != null) {
                 team.addPlayer(player);
-                recentActions.push("AddPlayerToTeam " + teamId + " " + playerId);
+                recentActions.push("AddPlayerToTeam " + teamId + " " + playerId); // Record action for undo
                 System.out.println("✔ Player added to team successfully.");
-            } 
-            else {
+            } else {
                 System.out.println("✘ Invalid team or player ID.");
             }
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("✘ Error adding player to team: " + e.getMessage());
         }
     }
-    //6.done
+
+    // Removes a player from a team
     void removePlayerFromTeam() {
-    	try {
-    		System.out.print("Enter team ID: ");
+        try {
+            System.out.print("Enter team ID: ");
             String teamId = scanner.nextLine();
             System.out.print("Enter player ID: ");
             String playerId = scanner.nextLine();
@@ -199,45 +171,39 @@ public class FantasyLeagueManagementSystem {
             Player player = players.get(playerId);
             if (team != null && player != null) {
                 team.removePlayer(player);
-                recentActions.push("RemovePlayerFromTeam " + teamId + " " + playerId);
+                recentActions.push("RemovePlayerFromTeam " + teamId + " " + playerId); // Record action for undo
                 System.out.println("✔ Player removed from team successfully.");
-            } 
-            else {
+            } else {
                 System.out.println("✘ Invalid team or player ID.");
             }
-        } 
-        catch (Exception e) {
-            System.out.println("✘ Error adding player to team: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("✘ Error removing player from team: " + e.getMessage());
         }
-    }	
-    //7.done
-    void displayTeam() {
-	    if (teams.isEmpty()) {
-	        System.out.println("No teams available.");
-	        return;
-	    }
-
-	    System.out.println("\nTeams:");
-	    for (Team team : teams.values()) {
-	        System.out.println("Team ID: " + team.id);
-	        System.out.println("Name: " + team.name);
-	        System.out.println("Total Score: " + team.getTotalScore());
-	        
-	        if (team.players.isEmpty()) {
-	            System.out.println("Players: No players in this team.");
-	        } 
-	        else {
-	            System.out.println("Players:");
-	            for (Player player : team.players) {
-	                System.out.println(" - ID: " + player.id + ", Name: " + player.name + ", Position: " + player.position + ", Score: " + player.score);
-	            }
-	        }
-	        
-	    }
-    	
-
     }
-  //8.done
+
+    // Displays details of all teams
+    void displayTeam() {
+        if (teams.isEmpty()) {
+            System.out.println("No teams available.");
+            return;
+        }
+        System.out.println("\nTeams:");
+        for (Team team : teams.values()) {
+            System.out.println("Team ID: " + team.id);
+            System.out.println("Name: " + team.name);
+            System.out.println("Total Score: " + team.getTotalScore());
+            if (team.players.isEmpty()) {
+                System.out.println("Players: No players in this team.");
+            } else {
+                System.out.println("Players:");
+                for (Player player : team.players) {
+                    System.out.println(" - ID: " + player.id + ", Name: " + player.name + ", Position: " + player.position + ", Score: " + player.score);
+                }
+            }
+        }
+    }
+
+    // Schedules a match between two teams
     void scheduleMatch() {
         try {
             System.out.print("Enter match ID: ");
@@ -248,251 +214,126 @@ public class FantasyLeagueManagementSystem {
             String team2Id = scanner.nextLine();
             if (teams.containsKey(team1Id) && teams.containsKey(team2Id)) {
                 matches.put(id, new Match(id, team1Id, team2Id));
-                recentActions.push("ScheduleMatch " + id);
+                recentActions.push("ScheduleMatch " + id); // Record action for undo
                 System.out.println("✔ Match scheduled successfully.");
-            }
-            else {
+            } else {
                 System.out.println("✘ Invalid team IDs.");
             }
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("✘ Error scheduling match: " + e.getMessage());
         }
     }
-  //9.done
+
+    // Updates the result of a match
     void updateMatchResult() {
         try {
             System.out.print("Enter match ID: ");
             String id = scanner.nextLine();
             Match match = matches.get(id);
             if (match != null) {
-                Team team1 = teams.get(match.team1Id);
-                System.out.print("Enter score for Team " + match.team1Id + ": ");
-                match.team1Score = 0;
-
-                
-                for (Player player : team1.players) {
-                    System.out.print("Score for " + player.name + " (ID: " + player.id + "): ");
-                    int playerScore = Integer.parseInt(scanner.nextLine());
-                    player.score += playerScore;
-                    match.team1Score += playerScore;
-                    
-                    if (playerScore == 1) {
-                        player.addFantasyPoints(2);
-                    } else if (playerScore > 2) {
-                        player.addFantasyPoints(5);
-                    } else if (playerScore > 3) {
-                        player.addFantasyPoints(7);
-                    }
-                }
-
-                Team team2 = teams.get(match.team2Id);
-                System.out.print("Enter score for Team " + match.team2Id + ": ");
-                match.team2Score=0;
-
-                
-                for (Player player : team2.players) {
-                    System.out.print("Score for " + player.name + " (ID: " + player.id + "): ");
-                    int playerScore = Integer.parseInt(scanner.nextLine());
-                    player.score += playerScore;
-                    match.team2Score+=playerScore;
-                    
-                    if (playerScore == 1) {
-                        player.addFantasyPoints(2);
-                    } else if (playerScore > 2) {
-                        player.addFantasyPoints(5);
-                    } else if (playerScore > 3) {
-                        player.addFantasyPoints(7);
-                    }
-                }
-
-                // Set match result
-                if (match.team1Score > match.team2Score) {
-                    match.result = "Team " + match.team1Id + " wins";
-                } else if (match.team1Score < match.team2Score) {
-                    match.result = "Team " + match.team2Id + " wins";
-                } else {
-                    match.result = "Draw";
-                }
-
-                
-                team1.getTotalFantasyPoints();
-                team2.getTotalFantasyPoints();
-
-                recentActions.push("UpdateMatchResult " + id);
-                System.out.println("✔ Match result updated: " + match.result);
+                // Get and update scores for each player on each team, and update the match result
+                updateTeamScore(match, match.team1Id);
+                updateTeamScore(match, match.team2Id);
+                System.out.print("Enter winning team ID: ");
+                String winnerId = scanner.nextLine();
+                match.setWinner(winnerId); // Set the winner team ID
+                recentActions.push("UpdateMatchResult " + id); // Record action for undo
+                System.out.println("✔ Match result updated successfully.");
             } else {
                 System.out.println("✘ Match not found.");
             }
-        } catch (NumberFormatException e) {
-            System.out.println("✘ Invalid score input. Please enter an integer.");
         } catch (Exception e) {
             System.out.println("✘ Error updating match result: " + e.getMessage());
         }
     }
 
-    //10.done
+    private void updateTeamScore(Match match, String teamId) {
+        try {
+            System.out.println("Enter scores for team ID " + teamId);
+            for (Player player : teams.get(teamId).players) {
+                System.out.print("Score for player " + player.name + " (ID: " + player.id + "): ");
+                player.score += Integer.parseInt(scanner.nextLine().trim());
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("✘ Invalid score format. Please enter numeric values.");
+        } catch (Exception e) {
+            System.out.println("✘ Error updating team score: " + e.getMessage());
+        }
+    }
+
+    // Displays the leaderboard of all teams
     void displayTeamsLeaderboard() {
-        try {
-            teamsleaderboard.clear();
-            teamsleaderboard.enqueue(teams.values());
-
-            System.out.println("\nLeaderboard:");
-            while (!teamsleaderboard.isEmpty()) {
-                Team team = teamsleaderboard.dequeue();
-                System.out.println(team.name + " - Total Score: " + team.getTotalScore());
-            }
-        } 
-        catch (Exception e) {
-            System.out.println("✘ Error displaying leaderboard: " + e.getMessage());
+        if (teamsleaderboard.isEmpty()) {
+            System.out.println("No teams on the leaderboard.");
+            return;
         }
-    }
-    //12.done
-    void displayFantasyLeaderboard() {
-        List<Team> fantasyLeaderboard = new ArrayList<>(teams.values());
-
-        // Bubble sort 
-        int n = fantasyLeaderboard.size();
-        quicksort(fantasyLeaderboard,0,n-1);
-        System.out.println("\nFantasy Leaderboard:");
-        for (Team team : fantasyLeaderboard) {
-            System.out.println(team.name + " - Fantasy Points: " + team.getTotalFantasyPoints());
-        }
-    }
-    //sorting 
-        
-    public void quicksort(List<Team> fantasyLeaderboard, int low, int high) {
-        if (low < high) {
-            int pivotIndex = partition(fantasyLeaderboard, low, high);
-            quicksort(fantasyLeaderboard, low, pivotIndex - 1);
-            quicksort(fantasyLeaderboard, pivotIndex + 1, high);
-        }
+        System.out.println("\nTeams Leaderboard:");
+        teamsleaderboard.display();
     }
 
-    private int partition(List<Team> fantasyLeaderboard, int low, int high) {
-        Team pivot = fantasyLeaderboard.get(high);
-        int i = low - 1;
-        
-        for (int j = low; j < high; j++) {
-            if (fantasyLeaderboard.get(j).getTotalFantasyPoints() > pivot.getTotalFantasyPoints()) {
-                i++;
-                Team temp = fantasyLeaderboard.get(i);
-                fantasyLeaderboard.set(i, fantasyLeaderboard.get(j));
-                fantasyLeaderboard.set(j, temp);
-            }
-        }
-        
-        Team temp = fantasyLeaderboard.get(i + 1);
-        fantasyLeaderboard.set(i + 1, fantasyLeaderboard.get(high));
-        fantasyLeaderboard.set(high, temp);
-        
-        return i + 1;
-    }
-
-
-  //11.done
+    // Displays the leaderboard of all players
     void displayPlayerLeaderBoard() {
-        // Step 1: Create an empty custom linked list
-        PlayerLinkedList playerList = new PlayerLinkedList();
-
-        // Step 2: Traverse the hashtable and add each player to the linked list
-        for (int i = 0; i < PlayerHashtable.capacity; i++) {
-            PlayerHashtable.Entry entry = PlayerHashtable.table[i];
-            while (entry != null) {
-                playerList.insert(entry.value);
-                entry = entry.next;
-            }
-        }
-
-        // Step 3: Sort the linked list by player scores in descending order
-        playerList.sort();
-
-        // Step 4: Display the sorted leaderboard
-        playerList.displayLeaderboard();
-        playerList.head=null;
+        players.display();
     }
-    
-    //12. done
+
+    // Displays the fantasy leaderboard
+    void displayFantasyLeaderboard() {
+        // Placeholder for Fantasy leaderboard functionality
+        System.out.println("Fantasy Leaderboard - coming soon!");
+    }
+
+    // Undoes the last action
     void undoLastAction() {
-        try {
-            if (!recentActions.isEmpty()) {
-                String lastAction = recentActions.pop();
-                String[] actionParts = lastAction.split(" ");
-                switch (actionParts[0]) {
-                    case "AddPlayer" :
-                        players.remove(actionParts[1]);
-                        System.out.println("✔ Last action undone: Added player removed.");
-                        break;
-                    case "RemovePlayer" :
-                    	Player temp=new Player(actionParts[1],actionParts[2],actionParts[3]);
-                    	temp.score=Integer.parseInt(actionParts[4]);
-                    	players.put(temp.id, temp);
-                    	System.out.println("✔ Last action undone: Removed player added.");
-                    	break;
-                    case "CreateTeam" :
-                        teams.remove(actionParts[1]);
-                        System.out.println("✔ Last action undone: Created team removed.");
-                        break;
-                        	
-                    case "AddPlayerToTeam" :
-                        Team team = teams.get(actionParts[1]);
-                        Player player = players.get(actionParts[2]);
-                        if (team != null && player != null) {
-                            team.removePlayer(player);
-                            System.out.println("✔ Last action undone: Player removed from team.");
-                        }
-                        break;
-                    case "RemovePlayerFromTeam" :
-                    	Team team1 = teams.get(actionParts[1]);
-                        Player player1 = players.get(actionParts[2]);
-                        if (team1 != null && player1 != null) {
-                            team1.addPlayer(player1);
-                            System.out.println("✔ Last action undone: Player added to team.");
-                        }
-                        break;
-                    case "ScheduleMatch" :
-                        matches.remove(actionParts[1]);
-                        System.out.println("✔ Last action undone: Scheduled match removed.");
-                        break;
-                    case "UpdateMatchResult" :
-                        Match match = matches.get(actionParts[1]);
-                        if (match != null) {
-                            match.team1Score = 0;
-                            match.team2Score = 0;
-                            match.result = "Pending";
-                            System.out.println("✔ Last action undone: Match result reset.");
-                        }
-                        break;
-                    default :
-                    	System.out.println("✘ Unknown action. Cannot undo.");
-                    	break;
-            }
-            }
-            else {
-                System.out.println("✘ No recent actions to undo.");
-            }
-        } 
-        catch (Exception e) {
-            System.out.println("✘ Error undoing last action: " + e.getMessage());
+        if (recentActions.isEmpty()) {
+            System.out.println("No actions to undo.");
+            return;
+        }
+        String[] action = recentActions.pop().split(" ");
+        switch (action[0]) {
+            case "AddPlayer":
+                players.remove(action[1]);
+                System.out.println("✔ Undo add player successful.");
+                break;
+            case "RemovePlayer":
+                players.put(action[1], new Player(action[1], action[2], action[3]));
+                players.get(action[1]).score = Integer.parseInt(action[4]);
+                System.out.println("✔ Undo remove player successful.");
+                break;
+            case "CreateTeam":
+                teams.remove(action[1]);
+                System.out.println("✔ Undo create team successful.");
+                break;
+            case "AddPlayerToTeam":
+                teams.get(action[1]).removePlayer(players.get(action[2]));
+                System.out.println("✔ Undo add player to team successful.");
+                break;
+            case "RemovePlayerFromTeam":
+                teams.get(action[1]).addPlayer(players.get(action[2]));
+                System.out.println("✔ Undo remove player from team successful.");
+                break;
+            case "ScheduleMatch":
+                matches.remove(action[1]);
+                System.out.println("✔ Undo schedule match successful.");
+                break;
+            case "UpdateMatchResult":
+                matches.get(action[1]).clearWinner();
+                System.out.println("✔ Undo update match result successful.");
+                break;
+            default:
+                System.out.println("✘ Invalid action to undo.");
+                break;
         }
     }
-    //13.done
-     void displayMatchHistory() {
-		    if (matches.isEmpty()) {
-		        System.out.println("No match history available.");
-		        return;
-		    }
 
-		    System.out.println("\nMatch History:");
-		    for (Match match : matches.values()) {
-		        System.out.println("Match ID: " + match.id);
-		        System.out.println("Date: " + match.date);
-		        System.out.println("Teams: " + match.team1Id + " vs " + match.team2Id);
-		        System.out.println("Scores: " + match.team1Id + " - " + match.team1Score + ", " + match.team2Id + " - " + match.team2Score);
-		        System.out.println("Result: " + match.result);
-		    }
-    		
-
-     }
-
+    // Displays match history
+    void displayMatchHistory() {
+        if (matches.isEmpty()) {
+            System.out.println("No matches available.");
+            return;
+        }
+        System.out.println("\nMatch History:");
+        for (Match match : matches.values()) {
+            System.out.println("Match ID: " + match.id + ", Teams: " + match.team1Id + " vs " + match.team2Id + ", Winner: " + match.winner);
+        }
+    }
 }
