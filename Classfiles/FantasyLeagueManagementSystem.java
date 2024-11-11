@@ -4,7 +4,7 @@ import java.util.*;
 public class FantasyLeagueManagementSystem {
     PlayerHashtable players = new PlayerHashtable(15);//Player hashtable
     HashMap<String, Team> teams = new HashMap<>();// Hashmap for teams
-    HashMap<String, Match> matches = new HashMap<>(); //hashmap for matches
+    HashMap<String, Match> matches = new LinkedHashMap<>(); //hashmap for matches
     CustomPriorityQueue teamsleaderboard = new CustomPriorityQueue(); //Priority Queue to display Leaderboard
     Stack recentActions = new Stack();// stack to access recent action
     
