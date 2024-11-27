@@ -1,5 +1,6 @@
 package DSA;
 import java.util.Collection;
+//priority queue to display teams leaderboard
 class CustomPriorityQueue {
 	class ListNode {
 	    Team team;
